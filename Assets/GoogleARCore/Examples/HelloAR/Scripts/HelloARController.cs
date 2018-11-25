@@ -24,7 +24,6 @@ namespace GoogleARCore.Examples.HelloAR
     using GoogleARCore;
     using GoogleARCore.Examples.Common;
     using UnityEngine;
-    using UnityEngine.UI;
 
 #if UNITY_EDITOR
     // Set up touch input propagation while using Instant Preview in the editor.
@@ -39,10 +38,20 @@ namespace GoogleARCore.Examples.HelloAR
         /// <summary>
         /// The first-person camera being used to render the passthrough camera image (i.e. AR background).
         /// </summary>
+        /// 
+
+        ///To keep track of the last clicked object
+        public static GameObject SelectedModel = null;
+
+
+        /// UI elements
+        public GameObject editPanel;
+        public GameObject SelectPanel;
+
+
         public Camera FirstPersonCamera;
-
-        public static GameObject SelectedModel = null; 
-
+        string msg = " ";
+        string touched = " ";
         /// <summary>
         /// A prefab for tracking and visualizing detected planes.
         /// </summary>
@@ -51,16 +60,18 @@ namespace GoogleARCore.Examples.HelloAR
         /// <summary>
         /// A model to place when a raycast from a user touch hits a plane.
         /// </summary>
-        public GameObject AndyAndroidPrefab;
+        public GameObject AndyPlanePrefab;
+        public GameObject[] furniture; 
+        /// <summary>
+        /// A model to place when a raycast from a user touch hits a feature point.
+        /// </summary>
+        public GameObject AndyPointPrefab;
 
         /// <summary>
         /// A gameobject parenting UI for displaying the "searching for planes" snackbar.
         /// </summary>
         public GameObject SearchingForPlaneUI;
-     
-        string msg = " ";
-        string touched = " ";
-        List<GameObject> selected = new List<GameObject>();
+
         /// <summary>
         /// The rotation in degrees need to apply to model when the Andy model is placed.
         /// </summary>
@@ -92,38 +103,43 @@ namespace GoogleARCore.Examples.HelloAR
                 if (m_AllPlanes[i].TrackingState == TrackingState.Tracking)
                 {
                     showSearchingUI = false;
+
+                    
                     break;
                 }
             }
 
             SearchingForPlaneUI.SetActive(showSearchingUI);
-
+            if (editPanel.activeInHierarchy == false)
+            {
+                SelectPanel.SetActive(!showSearchingUI);
+            }
             // If the player has not touched the screen, we are done with this update.
             Touch touch;
             if (Input.touchCount < 1 || (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
             {
                 return;
             }
-            RaycastHit hit2;
-            Ray raycast = Camera.main.ScreenPointToRay(touch.position);
+
             // Raycast against the location the player touched to search for planes.
             TrackableHit hit;
-
             TrackableHitFlags raycastFilter = TrackableHitFlags.PlaneWithinPolygon |
                 TrackableHitFlags.FeaturePointWithSurfaceNormal;
-            // Does the ray intersect any objects excluding the player layer
+
+            RaycastHit hit2;
+            Ray raycast = Camera.main.ScreenPointToRay(touch.position);
             if (Physics.Raycast(raycast, out hit2, Mathf.Infinity))
             {
 
 
-             
-                if (hit2.collider.CompareTag("andy"))
-                {
-                    touched = "andy";
-                   // SelectedModel = null;
-                    SelectedModel = hit2.transform.gameObject; 
-                  // SelectedModel.GetComponent<Renderer>().material.SetFloat("_Outline", 0.2f);
-                }
+
+                    // SelectedModel = null;
+                    SelectedModel = hit2.transform.gameObject;
+                    SelectedModel.transform.Find("highlighter").gameObject.SetActive(true); 
+                   // msg = " touced " + SelectedModel.name;
+                EnableEditing();
+                    // SelectedModel.GetComponent<Renderer>().material.SetFloat("_Outline", 0.2f);
+                
             }
             else
             {
@@ -139,13 +155,20 @@ namespace GoogleARCore.Examples.HelloAR
                     }
                     else
                     {
+                        // Choose the Andy model for the Trackable that got hit.
+                        GameObject prefab;
+                        if (hit.Trackable is FeaturePoint)
+                        {
+                            prefab = AndyPointPrefab;
+                        }
+                        else
+                        {
+                            prefab = AndyPlanePrefab;
+                        }
+
                         // Instantiate Andy model at the hit pose.
-                        GameObject andyObject = Instantiate(AndyAndroidPrefab, hit.Pose.position, hit.Pose.rotation);
+                        var andyObject = Instantiate(prefab, hit.Pose.position, hit.Pose.rotation);
 
-                        selected.Add(andyObject);
-
-
-                        msg = selected.Count.ToString();
                         // Compensate for the hitPose rotation facing away from the raycast (i.e. camera).
                         andyObject.transform.Rotate(0, k_ModelRotation, 0, Space.Self);
 
@@ -230,28 +253,50 @@ namespace GoogleARCore.Examples.HelloAR
                 }));
             }
         }
-        public void Scale(Slider sl)
-        {
-            Vector3 sc = new Vector3(sl.value, sl.value, sl.value);
-            Debug.Log("scA" + sl.value);
-            SelectedModel.transform.localScale = sc;
-           // Debug.Log("MODEL" + ModelCount);
-
-        }
-
-        public void Rotate(Slider sl)
-        {
-            Vector3 sc = new Vector3(0, sl.value, 0);
-            Debug.Log("scA" + sl.value);
-            SelectedModel.transform.rotation = Quaternion.Euler(sc);
-            Debug.Log("scale" + transform.localScale);
-        }
         void OnGUI()
         {
-           
-            GUI.Label(new Rect(100, 100, 1000, 202), "count"+msg);
 
-            GUI.Label(new Rect(200, 100, 1000, 202), "touched" + touched);
+            GUI.Label(new Rect(10, 10, 1000, 202), "count" + msg);
+
+            GUI.Label(new Rect(10, 20, 1000, 202), "touched" + touched);
+        }
+
+        public void enableLamp()
+        {
+            AndyPlanePrefab = furniture[4];
+            msg = "pressed lamp";
+        }
+        public void enableDesk()
+        {
+            AndyPlanePrefab = furniture[0];
+            msg = "pressed desk";
+        }
+        public void enableChair()
+        {
+            AndyPlanePrefab = furniture[1];
+            msg = "pressed chair";
+        }
+        public void enableTV()
+        {
+            AndyPlanePrefab = furniture[3];
+        }
+        public void enableDrawer()
+        {
+            AndyPlanePrefab = furniture[2];
+        }
+
+        public void EnableEditing()
+        {
+            SelectPanel.SetActive(false);
+            editPanel.SetActive(true);
+        }
+
+        public void QuitEditing()
+        {
+            SelectedModel.transform.Find("highlighter").gameObject.SetActive(false);
+            SelectedModel = null;
+            SelectPanel.SetActive(true);
+            editPanel.SetActive(false);
         }
     }
 }

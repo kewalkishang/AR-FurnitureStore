@@ -35,7 +35,7 @@ namespace GoogleARCoreInternal
     using UnityEditor;
 #endif
 
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
     using AndroidImport = GoogleARCoreInternal.DllImportNoop;
     using IOSImport = System.Runtime.InteropServices.DllImportAttribute;
 #else
@@ -52,7 +52,7 @@ namespace GoogleARCoreInternal
         /// <summary>
         /// Name of the Instant Preview plugin library.
         /// </summary>
-        public const string InstantPreviewNativeApi = "instant_preview_unity_plugin";
+        public const string InstantPreviewNativeApi = "arcore_instant_preview_unity_plugin";
 
         // Guid is taken from meta file and should never change.
         private const string k_ApkGuid = "cf7b10762fe921e40a18151a6c92a8a6";
@@ -189,7 +189,7 @@ namespace GoogleARCoreInternal
         public static void OnEarlyUpdate()
         {
             var session = LifecycleManager.Instance.SessionComponent;
-            if (Application.isEditor || session == null)
+            if (!Application.isEditor || session == null)
             {
                 return;
             }
