@@ -24,6 +24,7 @@ namespace GoogleARCore.Examples.HelloAR
     using GoogleARCore;
     using GoogleARCore.Examples.Common;
     using UnityEngine;
+    using UnityEngine.UI;
 
 #if UNITY_EDITOR
     // Set up touch input propagation while using Instant Preview in the editor.
@@ -47,7 +48,8 @@ namespace GoogleARCore.Examples.HelloAR
         /// UI elements
         public GameObject editPanel;
         public GameObject SelectPanel;
-
+        public GameObject scalerslider;
+        public GameObject rotateslider;
 
         public Camera FirstPersonCamera;
         string msg = " ";
@@ -132,7 +134,7 @@ namespace GoogleARCore.Examples.HelloAR
             {
 
 
-
+               // QuitEditing();
                     // SelectedModel = null;
                     SelectedModel = hit2.transform.gameObject;
                     SelectedModel.transform.Find("highlighter").gameObject.SetActive(true); 
@@ -297,6 +299,35 @@ namespace GoogleARCore.Examples.HelloAR
             SelectedModel = null;
             SelectPanel.SetActive(true);
             editPanel.SetActive(false);
+        }
+        public void EnableRotate()
+        {
+           
+            rotateslider.SetActive(true);
+            scalerslider.SetActive(false);
+
+        }
+        public void EnableScaler()
+        {
+
+            scalerslider.SetActive(true);
+            rotateslider.SetActive(false);
+        }
+        public void Scale(Slider sl)
+        {
+            Vector3 sc = new Vector3(sl.value, sl.value, sl.value);
+            Debug.Log("scA" + sl.value);
+            SelectedModel.transform.localScale = sc;
+            // Debug.Log("MODEL" + ModelCount);
+
+        }
+
+        public void Rotate(Slider sl)
+        {
+            Vector3 sc = new Vector3(0, sl.value*360, 0);
+            Debug.Log("scA" + sl.value);
+            SelectedModel.transform.rotation = Quaternion.Euler(sc);
+            Debug.Log("scale" + transform.localScale);
         }
     }
 }
