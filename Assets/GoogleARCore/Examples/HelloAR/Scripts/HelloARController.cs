@@ -44,6 +44,7 @@ namespace GoogleARCore.Examples.HelloAR
         ///To keep track of the last clicked object
         public static GameObject SelectedModel = null;
 
+        public static bool move = false;
 
         /// UI elements
         public GameObject editPanel;
@@ -117,72 +118,102 @@ namespace GoogleARCore.Examples.HelloAR
                 SelectPanel.SetActive(!showSearchingUI);
             }
             // If the player has not touched the screen, we are done with this update.
-            Touch touch;
-            if (Input.touchCount < 1 || (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
+            if (move == false)
             {
-                return;
-            }
-
-            // Raycast against the location the player touched to search for planes.
-            TrackableHit hit;
-            TrackableHitFlags raycastFilter = TrackableHitFlags.PlaneWithinPolygon |
-                TrackableHitFlags.FeaturePointWithSurfaceNormal;
-
-            RaycastHit hit2;
-            Ray raycast = Camera.main.ScreenPointToRay(touch.position);
-            if (Physics.Raycast(raycast, out hit2, Mathf.Infinity))
-            {
-
-
-               // QuitEditing();
-                    // SelectedModel = null;
-                    SelectedModel = hit2.transform.gameObject;
-                    SelectedModel.transform.Find("highlighter").gameObject.SetActive(true); 
-                   // msg = " touced " + SelectedModel.name;
-                EnableEditing();
-                    // SelectedModel.GetComponent<Renderer>().material.SetFloat("_Outline", 0.2f);
-                
-            }
-            else
-            {
-                if (Frame.Raycast(touch.position.x, touch.position.y, raycastFilter, out hit))
+                Touch touch;
+                if (Input.touchCount < 1 || (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
                 {
-                    // Use hit pose and camera pose to check if hittest is from the
-                    // back of the plane, if it is, no need to create the anchor.
-                    if ((hit.Trackable is DetectedPlane) &&
-                        Vector3.Dot(FirstPersonCamera.transform.position - hit.Pose.position,
-                            hit.Pose.rotation * Vector3.up) < 0)
+                    return;
+                }
+
+                // Raycast against the location the player touched to search for planes.
+                TrackableHit hit;
+                TrackableHitFlags raycastFilter = TrackableHitFlags.PlaneWithinPolygon |
+                    TrackableHitFlags.FeaturePointWithSurfaceNormal;
+
+                RaycastHit hit2;
+                Ray raycast = Camera.main.ScreenPointToRay(touch.position);
+                if (Physics.Raycast(raycast, out hit2, Mathf.Infinity))
+                {
+
+
+                    if (SelectedModel != null)
                     {
-                        Debug.Log("Hit at back of the current DetectedPlane");
+                        SelectedModel.transform.Find("highlighter").gameObject.SetActive(false);
                     }
-                    else
+
+                    SelectedModel = hit2.transform.gameObject;
+                    SelectedModel.transform.Find("highlighter").gameObject.SetActive(true);
+                    EnableEditing();
+
+
+                }
+                else
+                {
+                    if (Frame.Raycast(touch.position.x, touch.position.y, raycastFilter, out hit) && (editPanel.activeInHierarchy == false))
                     {
-                        // Choose the Andy model for the Trackable that got hit.
-                        GameObject prefab;
-                        if (hit.Trackable is FeaturePoint)
+                        // Use hit pose and camera pose to check if hittest is from the
+                        // back of the plane, if it is, no need to create the anchor.
+                        if ((hit.Trackable is DetectedPlane) &&
+                            Vector3.Dot(FirstPersonCamera.transform.position - hit.Pose.position,
+                                hit.Pose.rotation * Vector3.up) < 0)
                         {
-                            prefab = AndyPointPrefab;
+                            Debug.Log("Hit at back of the current DetectedPlane");
                         }
                         else
                         {
-                            prefab = AndyPlanePrefab;
+                            // Choose the Andy model for the Trackable that got hit.
+                            GameObject prefab;
+                            if (hit.Trackable is FeaturePoint)
+                            {
+                                prefab = AndyPointPrefab;
+                            }
+                            else
+                            {
+                                prefab = AndyPlanePrefab;
+                            }
+
+                            // Instantiate Andy model at the hit pose.
+                            var andyObject = Instantiate(prefab, hit.Pose.position, hit.Pose.rotation);
+
+                            // Compensate for the hitPose rotation facing away from the raycast (i.e. camera).
+                            andyObject.transform.Rotate(0, k_ModelRotation, 0, Space.Self);
+
+                            // Create an anchor to allow ARCore to track the hitpoint as understanding of the physical
+                            // world evolves.
+                            var anchor = hit.Trackable.CreateAnchor(hit.Pose);
+
+                            // Make Andy model a child of the anchor.
+                            andyObject.transform.parent = anchor.transform;
                         }
-
-                        // Instantiate Andy model at the hit pose.
-                        var andyObject = Instantiate(prefab, hit.Pose.position, hit.Pose.rotation);
-
-                        // Compensate for the hitPose rotation facing away from the raycast (i.e. camera).
-                        andyObject.transform.Rotate(0, k_ModelRotation, 0, Space.Self);
-
-                        // Create an anchor to allow ARCore to track the hitpoint as understanding of the physical
-                        // world evolves.
-                        var anchor = hit.Trackable.CreateAnchor(hit.Pose);
-
-                        // Make Andy model a child of the anchor.
-                        andyObject.transform.parent = anchor.transform;
                     }
                 }
             }
+             else
+            {
+                msg = "in moving ";
+                Touch touch;
+                if (Input.touchCount == 1 && (touch = Input.GetTouch(0)).phase != TouchPhase.Began)
+                {
+                    msg = "ssasd ";
+                    TrackableHit hit;
+                    TrackableHitFlags raycastFilter = TrackableHitFlags.PlaneWithinPolygon |
+                   TrackableHitFlags.FeaturePointWithSurfaceNormal;
+
+                    if (Frame.Raycast(touch.position.x, touch.position.y, raycastFilter, out hit))
+                    {
+                        msg = "hot raycast ";
+                        // Use hit pose and camera pose to check if hittest is from the
+                        // back of the plane, if it is, no need to create the anchor.
+                        if (hit.Trackable is DetectedPlane)
+                        {
+                            SelectedModel.transform.position = hit.Pose.position;
+                        }
+                        
+                    }
+                }
+            }
+
         }
 
         /// <summary>
@@ -299,12 +330,14 @@ namespace GoogleARCore.Examples.HelloAR
             SelectedModel = null;
             SelectPanel.SetActive(true);
             editPanel.SetActive(false);
+            move = false;
         }
         public void EnableRotate()
         {
            
             rotateslider.SetActive(true);
             scalerslider.SetActive(false);
+            move = false;
 
         }
         public void EnableScaler()
@@ -312,10 +345,11 @@ namespace GoogleARCore.Examples.HelloAR
 
             scalerslider.SetActive(true);
             rotateslider.SetActive(false);
+            move = false;
         }
         public void Scale(Slider sl)
-        {
-            Vector3 sc = new Vector3(sl.value, sl.value, sl.value);
+        { float val = sl.value;
+            Vector3 sc = new Vector3(val,val,val);
             Debug.Log("scA" + sl.value);
             SelectedModel.transform.localScale = sc;
             // Debug.Log("MODEL" + ModelCount);
@@ -329,5 +363,20 @@ namespace GoogleARCore.Examples.HelloAR
             SelectedModel.transform.rotation = Quaternion.Euler(sc);
             Debug.Log("scale" + transform.localScale);
         }
+
+        public void DeleteObject()
+        {
+            Destroy(SelectedModel.transform.parent.gameObject);
+            SelectedModel = null;
+            SelectPanel.SetActive(true);
+            editPanel.SetActive(false);
+
+        }
+        public void MoveObject()
+        {
+            move = true;
+        }
+        
+
     }
 }

@@ -113,52 +113,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &2421818
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 1.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: -0.99149036
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 0.13018018
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_RootOrder
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4085570334083294, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -165.04
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 721fa0d66fef4454c9da79ead84979e3, type: 2}
-  m_IsPrefabParent: 0
 --- !u!1 &10180249
 GameObject:
   m_ObjectHideFlags: 0
@@ -2217,7 +2171,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 769820793}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 627916103}
+        m_MethodName: MoveObject
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &769820793
@@ -2739,7 +2704,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 990159567}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 627916103}
+        m_MethodName: DeleteObject
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &990159567
