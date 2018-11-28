@@ -51,7 +51,7 @@ namespace GoogleARCore.Examples.HelloAR
         public GameObject SelectPanel;
         public GameObject scalerslider;
         public GameObject rotateslider;
-
+        public GameObject ColorSliders;
         public Camera FirstPersonCamera;
         string msg = " ";
         string touched = " ";
@@ -322,33 +322,36 @@ namespace GoogleARCore.Examples.HelloAR
         {
             SelectPanel.SetActive(false);
             editPanel.SetActive(true);
+            ColorSliders.SetActive(false);
         }
 
         public void QuitEditing()
         {
             SelectedModel.transform.Find("highlighter").gameObject.SetActive(false);
             SelectedModel = null;
+            ColorSliders.SetActive(false);
             SelectPanel.SetActive(true);
             editPanel.SetActive(false);
             move = false;
         }
         public void EnableRotate()
         {
-           
+            ColorSliders.SetActive(false);
             rotateslider.SetActive(true);
             scalerslider.SetActive(false);
             move = false;
-
+           
         }
         public void EnableScaler()
         {
-
+            ColorSliders.SetActive(false);
             scalerslider.SetActive(true);
             rotateslider.SetActive(false);
             move = false;
+            
         }
         public void Scale(Slider sl)
-        { float val = sl.value;
+        { float val = sl.value+1;
             Vector3 sc = new Vector3(val,val,val);
             Debug.Log("scA" + sl.value);
             SelectedModel.transform.localScale = sc;
@@ -362,6 +365,7 @@ namespace GoogleARCore.Examples.HelloAR
             Debug.Log("scA" + sl.value);
             SelectedModel.transform.rotation = Quaternion.Euler(sc);
             Debug.Log("scale" + transform.localScale);
+            
         }
 
         public void DeleteObject()
@@ -370,13 +374,62 @@ namespace GoogleARCore.Examples.HelloAR
             SelectedModel = null;
             SelectPanel.SetActive(true);
             editPanel.SetActive(false);
-
+            ColorSliders.SetActive(false);
         }
         public void MoveObject()
         {
             move = true;
+            SelectPanel.SetActive(false);
+            editPanel.SetActive(false);
+            ColorSliders.SetActive(false);
         }
-        
+
+
+        public void EnableColor()
+        {
+            move = false;
+         
+            ColorSliders.SetActive(true);
+
+            Material mat = new Material(Shader.Find("Standard"));
+            GameObject mod = SelectedModel.transform.Find("model").gameObject;
+            GameObject ss = mod.transform.Find("color").gameObject;
+            foreach (Transform child in ss.transform)
+            {
+                Renderer rend = child.gameObject.GetComponent<Renderer>();
+                rend.material = mat;
+                rend.material.SetColor("_Color", new Color(0, 0, 0));
+                // Debug.Log("color" + ;
+            }
+        }
+
+        public void ChangeRed(Slider s)
+        {
+            foreach (Transform child in SelectedModel.transform.Find("model").gameObject.transform.Find("color").gameObject.transform)
+            {
+                Renderer rend = child.gameObject.GetComponent<Renderer>();
+                rend.material.SetColor("_Color", new Color(s.value, rend.material.color[1], rend.material.color[2]));
+            }
+            //   gameObject
+        }
+
+        public void ChangeGreen(Slider s)
+        {
+            foreach (Transform child in SelectedModel.transform.Find("model").gameObject.transform.Find("color").gameObject.transform)
+            {
+                Renderer rend = child.gameObject.GetComponent<Renderer>();
+                rend.material.SetColor("_Color", new Color(rend.material.color[0], s.value, rend.material.color[2]));
+            }
+        }
+
+        public void ChangeBlue(Slider s)
+        {
+            foreach (Transform child in SelectedModel.transform.Find("model").gameObject.transform.Find("color").gameObject.transform)
+            {
+                Renderer rend = child.gameObject.GetComponent<Renderer>();
+                rend.material.SetColor("_Color", new Color(rend.material.color[0], rend.material.color[1], s.value));
+            }
+        }
 
     }
 }

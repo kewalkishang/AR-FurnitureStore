@@ -137,7 +137,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4928967411204374}
   m_Layer: 0
-  m_Name: Chair
+  m_Name: model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -390,7 +390,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4109244727777864}
   m_Layer: 0
-  m_Name: group_2081183087
+  m_Name: color
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
