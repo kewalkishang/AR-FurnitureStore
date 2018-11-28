@@ -12,3 +12,7 @@ Unity 2018.1.0f2 (64-bit) <br />
 ARCore 1.5.0
 
 ### Demo -
+![](demo.gif)
+
+<br />
+*All models from google poly* 

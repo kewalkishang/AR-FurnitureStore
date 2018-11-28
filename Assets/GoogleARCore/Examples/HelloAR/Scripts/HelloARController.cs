@@ -380,15 +380,16 @@ namespace GoogleARCore.Examples.HelloAR
         {
             move = true;
             SelectPanel.SetActive(false);
-            editPanel.SetActive(false);
             ColorSliders.SetActive(false);
+            rotateslider.SetActive(false);
         }
 
 
         public void EnableColor()
         {
             move = false;
-         
+            scalerslider.SetActive(false);
+            rotateslider.SetActive(false);
             ColorSliders.SetActive(true);
 
             Material mat = new Material(Shader.Find("Standard"));
